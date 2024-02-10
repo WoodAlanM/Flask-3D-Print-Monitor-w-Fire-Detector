@@ -1,0 +1,50 @@
+.led-green {
+    background-color: #94E185;
+    box-shadow: 0px 0px 4px 1px #94E185;
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    margin-right: 10px;
+    margin-left: 10px;
+    border: 1px solid #78D965;
+    border-radius: 20px;
+}
+    
+.led-gray {
+    background-color: #c4c4c4;
+    box-shadow: 0px 0px 4px 1px #bdbdbd;
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    margin-right: 10px;
+    margin-left: 10px;
+    border: 1px solid #adadad;
+    border-radius: 20px;
+}
+
+.led-yellow {
+    background-color: #e5ff00;
+    box-shadow: 0px 0px 4px 1px #bdbdbd;
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    margin-right: 10px;
+    margin-left: 10px;
+    border: 1px solid #adadad;
+    border-radius: 20px;
+}
+
+#power_button{
+    display: block;
+    padding: 1em;
+}
+
+#ledupdate{
+    display: block;
+    margin: auto;
+}
+
+#ledfire{
+    display: block;
+    margin: auto;
+}

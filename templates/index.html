@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html> 
+ <head> 
+   <title>Video Streaming </title> 
+      <!--Import Google Icon Font-->
+      <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+      <!--Import materialize.css-->
+      <link type="text/css" rel="stylesheet" href="static/css/materialize.min.css"  media="screen,projection"/>
+      <link type="text/css" rel="stylesheet" href="static/css/main.css"  media="screen,projection"/>
+
+      <!--Let browser know website is optimized for mobile-->
+      <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+	  
+
+	<style>
+	.tabs .indicator {
+  		background-color: black;
+  		/*Custom Color Of Indicator*/
+	}	
+	.tabs .tab a:focus.active {
+  		color: #b8b8bf;
+  		/*Custom Text Color While Active*/
+  		background-color: #b8b8bf;
+  		/*Custom Background Color While Active*/
+	}
+
+	tr, th, td {
+  		border: 1px;
+		border-color: black;
+		border-style: solid;
+	}
+	#info_column{
+		height: 100%;
+		width: 30%;
+	}
+	#camera_column{
+		width: 70%;
+	}
+	.video_feed{
+		display: block;
+		width: 100%;
+		margin-top: auto;
+	}
+	
+    </style>
+
+ </head> 
+ <body>
+
+	<script type="text/javascript" src="static/js/jquery-3.6.0.min.js"></script>
+
+<h5 class="center"> Live Stream </h5> 
+	<div class="container">
+		<div class="row"> 		
+			<div class="col l9 m9 s12">
+					<div class="center">
+						<img id="video_feed_one" class="video_feed" src="{{ url_for('video_feed_one') }}"> 
+						<img id="video_feed_two" class="video_feed" src="{{ url_for('video_feed_two') }}">
+					</div>
+			</div>
+			<div class="col l3 m3 s12">
+				<table>
+					<tr>
+					<!-- Camera Picker -->
+						<div id="camera_selector" class="input-field col s12">
+							<select>
+							<option value="1">Camera One</option>
+							<option value="2">Camera Two</option>
+							</select>
+							<label>Camera Selection</label>
+						</div>
+					</tr>
+					<tr>
+						<!-- Button for toggling power -->
+						<div class='container center'>
+							<a href="#" id="power_button" class="center"><button class="btn waves-effect waves-light blue" type="submit" name="submit1" value="submit1">Toggle Power</button></a>        
+						</div>
+					</tr>
+					<tr>
+						<th style="width: 100%" colspan="2" class="center">Outlet Status:</th>
+					</tr>
+					<tr>
+						<td style="width: 20%;">
+							<div class="container center">
+								<div id="ledupdate" class=""></div>
+							</div>
+						</td>
+						<td style="width: 80%;">
+							<div class="container center">
+								<p id="powerdesc"></p>
+							</div>
+						</td>
+					</tr>
+					<tr>
+						<th style="width: 100%" colspan="2" class="center">Fire Detection:</th>
+					</tr>
+					<tr>
+						<td style="width: 20%;">
+							<div class="container center">
+								<div id="ledfire" class=""></div>
+							</div>
+						</td>
+						<td style="width: 80%;">
+							<div class="center">
+								<div id="fire_switch" class="switch">
+									<label>
+									Off
+									<input type="checkbox">
+									<span class="lever"></span>
+									On
+									</label>
+								</div>
+							</div>
+						</td>
+					</tr>
+				</table>
+			</div>
+		</div>
+	</div>	
+    
+
+
+<!-- script for when the fire toggle swith changes -->
+<script>
+	$('#fire_switch').change(function() {
+		if ($(this).find(":checked").val()) {
+			$('#ledfire').attr('class', 'led-green')
+		} else {
+			$('#ledfire').attr('class', 'led-gray')
+		}
+});
+</script>
+
+<!-- script for when the select box changes -->
+<script>
+	$('#camera_selector').change(function() {    
+		var selection = $(this).find(":selected").val()
+		if(selection == "1"){
+			$('#video_feed_one').show()
+			$('#video_feed_two').hide()
+		}else{
+			$('#video_feed_one').hide()
+			$('#video_feed_two').show()
+		}
+	});
+</script>
+
+<!-- script for checking the outlet and fire status every 10 seconds -->
+<script>
+	function check_outlet(){
+		$.ajax("/check_outlet", {dataType:'json', cache: false}).done(function(data){
+			if (data['plug'] == "on"){
+				$("#ledupdate").attr('class', 'led-green')
+				$('#powerdesc').text('Power Source On')
+			}else {
+				$("#ledupdate").attr('class', 'led-gray')
+				$('#powerdesc').text('Power Source Off')
+			}
+		});
+	}
+
+	function check_fire(){
+		$.ajax("/check_fire", {dataType:'json', cache: false}).done(function(data){
+			if(data['fire'] == "fire"){
+				alert("There could be a fire")
+			};
+		});
+	}
+
+	var has_ran = false
+	if (has_ran == false){
+		$('#ledupdate').attr('class', 'led-yellow')
+		$('#powerdesc').text('Detecting Power Source')
+		$('#video_feed_two').hide()
+		$('#ledfire').attr('class', 'led-gray')
+		has_ran = true
+	}
+	var status_interval = setInterval(
+		 function() {
+			 check_outlet();
+			 if($('#ledfire').hasClass('led-green')){
+				check_fire();
+			 }
+		 }, 10000);
+</script>
+
+<!-- script for button click of power button -->
+<script type='text/javascript'>
+	$(function() {
+	  $('a#power_button').on('click', function(e) {
+		if(confirm("Are you sure you want to toggle the power on this switch?")){
+			e.preventDefault()
+			$.getJSON('/button_toggle',
+				function(data) {
+			//do nothing
+			});
+			return false;}
+			}
+		);
+	});
+</script>
+
+<script type="text/javascript" src="static/js/materialize.min.js"></script>
+<script type="text/javascript" src="static/js/init.js"></script>  
+
+</body>
+</html>
+
